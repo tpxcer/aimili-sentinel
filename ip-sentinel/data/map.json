@@ -1,0 +1,841 @@
+{
+  "version": "3.5.2",
+  "updated_at": "2026-04-19",
+  "continents": [
+    {
+      "id": "ASIA",
+      "name": "亚太战区 (Asia-Pacific)",
+      "countries": [
+        {
+          "id": "JP",
+          "name": "Japan (日本)",
+          "keyword_file": "kw_JP.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Tokyo",
+                  "name": "Tokyo (东京)"
+                },
+                {
+                  "id": "Osaka",
+                  "name": "Osaka (大阪)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SG",
+          "name": "Singapore (新加坡)",
+          "keyword_file": "kw_SG.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Singapore",
+                  "name": "Singapore (新加坡)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "PH",
+          "name": "Philippines (菲律宾)",
+          "keyword_file": "kw_PH.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Manila",
+                  "name": "Manila (马尼拉)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "TH",
+          "name": "Thailand (泰国)",
+          "keyword_file": "kw_TH.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Bangkok",
+                  "name": "Bangkok (曼谷)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "KH",
+          "name": "Cambodia (柬埔寨)",
+          "keyword_file": "kw_KH.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "PhnomPenh",
+                  "name": "Phnom Penh (金边)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "MM",
+          "name": "Myanmar (缅甸)",
+          "keyword_file": "kw_MM.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Yangon",
+                  "name": "Yangon (仰光)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "LA",
+          "name": "Laos (老挝)",
+          "keyword_file": "kw_LA.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Vientiane",
+                  "name": "Vientiane (万象)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ID",
+          "name": "Indonesia (印度尼西亚)",
+          "keyword_file": "kw_ID.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Jakarta",
+                  "name": "Jakarta (雅加达)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "IN",
+          "name": "India (印度)",
+          "keyword_file": "kw_IN.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Delhi",
+                  "name": "Delhi (新德里)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "MN",
+          "name": "Mongolia (蒙古)",
+          "keyword_file": "kw_MN.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Ulaanbaatar",
+                  "name": "Ulaanbaatar (乌兰巴托)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "NP",
+          "name": "Nepal (尼泊尔)",
+          "keyword_file": "kw_NP.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Kathmandu",
+                  "name": "Kathmandu (加德满都)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "BD",
+          "name": "Bangladesh (孟加拉)",
+          "keyword_file": "kw_BD.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Dhaka",
+                  "name": "Dhaka (达卡)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "AE",
+          "name": "United Arab Emirates (阿联酋)",
+          "keyword_file": "kw_AE.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Dubai",
+                  "name": "Dubai (迪拜)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SA",
+          "name": "Saudi Arabia (沙特阿拉伯)",
+          "keyword_file": "kw_SA.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Riyadh",
+                  "name": "Riyadh (利雅得)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "KR",
+          "name": "South Korea (韩国)",
+          "keyword_file": "kw_KR.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Seoul",
+                  "name": "Seoul (首尔)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "HK",
+          "name": "Hong Kong (香港)",
+          "keyword_file": "kw_HK.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "HongKong",
+                  "name": "Hong Kong (香港)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "MO",
+          "name": "Macau (澳门)",
+          "keyword_file": "kw_MO.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Macau",
+                  "name": "Macau (澳门)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "VN",
+          "name": "Vietnam (越南)",
+          "keyword_file": "kw_VN.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Hanoi",
+                  "name": "Hanoi (河内)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "TW",
+          "name": "Taiwan (台湾)",
+          "keyword_file": "kw_TW.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Taipei",
+                  "name": "Taipei (台北)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "MY",
+          "name": "Malaysia (马来西亚)",
+          "keyword_file": "kw_MY.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Kuala_Lumpur",
+                  "name": "Kuala Lumpur (吉隆坡)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "EUROPE",
+      "name": "欧洲战区 (Europe)",
+      "countries": [
+        {
+          "id": "UK",
+          "name": "United Kingdom (英国)",
+          "keyword_file": "kw_UK.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "London",
+                  "name": "London (伦敦)"
+                },
+                {
+                  "id": "Coventry",
+                  "name": "Coventry (考文垂)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "TR",
+          "name": "Turkey (土耳其)",
+          "keyword_file": "kw_TR.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Istanbul",
+                  "name": "Istanbul (伊斯坦布尔)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "BG",
+          "name": "Bulgaria (保加利亚)",
+          "keyword_file": "kw_BG.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Sofia",
+                  "name": "Sofia (索非亚)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "DE",
+          "name": "Germany (德国)",
+          "keyword_file": "kw_DE.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Frankfurt",
+                  "name": "Frankfurt (法兰克福)"
+                }
+              ]
+            },
+            {
+              "id": "SN",
+              "name": "Saxony (萨克森州)",
+              "cities": [
+                {
+                  "id": "Falkenstein",
+                  "name": "Falkenstein (法尔肯施泰因)"
+                }
+              ]
+            },
+            {
+              "id": "BY",
+              "name": "Bavaria (巴伐利亚州)",
+              "cities": [
+                {
+                  "id": "Nuremberg",
+                  "name": "Nuremberg (纽伦堡)"
+                }
+              ]
+            },
+            {
+              "id": "BE",
+              "name": "Berlin (柏林州)",
+              "cities": [
+                {
+                  "id": "Berlin",
+                  "name": "Berlin (柏林)"
+                }
+              ]
+            },
+            {
+              "id": "NW",
+              "name": "North Rhine-Westphalia (北莱茵-威斯特法伦州)",
+              "cities": [
+                {
+                  "id": "Aachen",
+                  "name": "Aachen (亚琛)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "FR",
+          "name": "France (法国)",
+          "keyword_file": "kw_FR.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Paris",
+                  "name": "Paris (巴黎)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "NL",
+          "name": "Netherlands (荷兰)",
+          "keyword_file": "kw_NL.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Amsterdam",
+                  "name": "Amsterdam (阿姆斯特丹)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ES",
+          "name": "Spain (西班牙)",
+          "keyword_file": "kw_ES.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Madrid",
+                  "name": "Madrid (马德里)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AMERICAS",
+      "name": "美洲战区 (Americas)",
+      "countries": [
+        {
+          "id": "US",
+          "name": "United States (美国)",
+          "keyword_file": "kw_US.txt",
+          "states": [
+            {
+              "id": "AZ",
+              "name": "Arizona (亚利桑那州)",
+              "cities": [
+                {
+                  "id": "Phoenix",
+                  "name": "Phoenix (凤凰城)"
+                }
+              ]
+            },
+            {
+              "id": "CA",
+              "name": "California (加州)",
+              "cities": [
+                {
+                  "id": "Los_Angeles",
+                  "name": "Los Angeles (洛杉矶)"
+                },
+                {
+                  "id": "Ontario",
+                  "name": "Ontario (安大略)"
+                },
+                {
+                  "id": "San_Jose",
+                  "name": "San Jose (圣何塞)"
+                },
+                {
+                  "id": "Fremont",
+                  "name": "Fremont (弗里蒙特)"
+                }
+              ]
+            },
+            {
+              "id": "FL",
+              "name": "Florida (佛罗里达州)",
+              "cities": [
+                {
+                  "id": "Miami",
+                  "name": "Miami (迈阿密)"
+                }
+              ]
+            },
+            {
+              "id": "GA",
+              "name": "Georgia (佐治亚州)",
+              "cities": [
+                {
+                  "id": "Atlanta",
+                  "name": "Atlanta (亚特兰大)"
+                }
+              ]
+            },
+            {
+              "id": "HI",
+              "name": "Hawaii",
+              "cities": [
+                {
+                  "id": "Honolulu",
+                  "name": "Honolulu (檀香山)"
+                }
+              ]
+            },
+            {
+              "id": "IA",
+              "name": "Iowa (爱荷华州)",
+              "cities": [
+                {
+                  "id": "Council_Bluffs",
+                  "name": "Council Bluffs (康瑟尔布拉夫斯)"
+                }
+              ]
+            },
+            {
+              "id": "IL",
+              "name": "Illinois (伊利诺伊州)",
+              "cities": [
+                {
+                  "id": "Warrenville",
+                  "name": "Warrenville (沃伦维尔)"
+                }
+              ]
+            },
+            {
+              "id": "KS",
+              "name": "Kansas (堪萨斯州)",
+              "cities": [
+                {
+                  "id": "Kansas_City",
+                  "name": "Kansas City (堪萨斯城)"
+                }
+              ]
+            },
+            {
+              "id": "NC",
+              "name": "North Carolina (北卡罗来纳州)",
+              "cities": [
+                {
+                  "id": "Charlotte",
+                  "name": "Charlotte (夏洛特)"
+                }
+              ]
+            },
+            {
+              "id": "NJ",
+              "name": "New Jersey (新泽西州)",
+              "cities": [
+                {
+                  "id": "Newark",
+                  "name": "Newark (纽瓦克)"
+                }
+              ]
+            },
+            {
+              "id": "NV",
+              "name": "Nevada (内华达州)",
+              "cities": [
+                {
+                  "id": "Las_Vegas",
+                  "name": "Las Vegas (拉斯维加斯)"
+                }
+              ]
+            },
+            {
+              "id": "NY",
+              "name": "New York (纽约州)",
+              "cities": [
+                {
+                  "id": "New_York",
+                  "name": "New York (纽约)"
+                }
+              ]
+            },
+            {
+              "id": "OH",
+              "name": "Ohio (俄亥俄州)",
+              "cities": [
+                {
+                  "id": "Columbus",
+                  "name": "Columbus (哥伦布)"
+                }
+              ]
+            },
+            {
+              "id": "OR",
+              "name": "Oregon (俄勒冈州)",
+              "cities": [
+                {
+                  "id": "Bend",
+                  "name": "Bend (本德)"
+                }
+              ]
+            },
+            {
+              "id": "TX",
+              "name": "Texas (得克萨斯州)",
+              "cities": [
+                {
+                  "id": "Dallas",
+                  "name": "Dallas (达拉斯)"
+                },
+                {
+                  "id": "Houston",
+                  "name": "Houston (休斯顿)"
+                }
+              ]
+            },
+            {
+              "id": "UT",
+              "name": "Utah (犹他州)",
+              "cities": [
+                {
+                  "id": "Salt_Lake_City",
+                  "name": "Salt Lake City (盐湖城)"
+                }
+              ]
+            },
+            {
+              "id": "VA",
+              "name": "Virginia (弗吉尼亚州)",
+              "cities": [
+                {
+                  "id": "Ashburn",
+                  "name": "Ashburn (阿什本)"
+                }
+              ]
+            },
+            {
+              "id": "WA",
+              "name": "Washington (华盛顿州)",
+              "cities": [
+                {
+                  "id": "Seattle",
+                  "name": "Seattle (西雅图)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "CA",
+          "name": "Canada (加拿大)",
+          "keyword_file": "kw_CA.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Toronto",
+                  "name": "Toronto (多伦多)"
+                },
+                {
+                  "id": "Montreal",
+                  "name": "Montreal (蒙特利尔)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "OCEANIA",
+      "name": "大洋洲战区 (Oceania)",
+      "countries": [
+        {
+          "id": "AU",
+          "name": "Australia (澳大利亚)",
+          "keyword_file": "kw_AU.txt",
+          "states": [
+            {
+              "id": "NSW",
+              "name": "New South Wales (新南威尔士州)",
+              "cities": [
+                {
+                  "id": "Sydney",
+                  "name": "Sydney (悉尼)"
+                }
+              ]
+            },
+            {
+              "id": "VIC",
+              "name": "Victoria (维多利亚州)",
+              "cities": [
+                {
+                  "id": "Melbourne",
+                  "name": "Melbourne (墨尔本)"
+                }
+              ]
+            },
+            {
+              "id": "QLD",
+              "name": "Queensland (昆士兰州)",
+              "cities": [
+                {
+                  "id": "Brisbane",
+                  "name": "Brisbane (布里斯班)"
+                }
+              ]
+            },
+            {
+              "id": "WA",
+              "name": "Western Australia (西澳大利亚州)",
+              "cities": [
+                {
+                  "id": "Perth",
+                  "name": "Perth (珀斯)"
+                }
+              ]
+            },
+            {
+              "id": "SA",
+              "name": "South Australia (南澳大利亚州)",
+              "cities": [
+                {
+                  "id": "Adelaide",
+                  "name": "Adelaide (阿德莱德)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AFRICA",
+      "name": "非洲战区 (Africa)",
+      "countries": [
+        {
+          "id": "NG",
+          "name": "Nigeria (尼日利亚)",
+          "keyword_file": "kw_NG.txt",
+          "states": [
+            {
+              "id": "Default",
+              "name": "Default State",
+              "cities": [
+                {
+                  "id": "Lagos",
+                  "name": "Lagos (拉各斯)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+name: Automated Massive UA Factory
+
+on:
+  schedule:
+    # 每个月 1 号凌晨 04:00 执行
+    - cron: '0 4 1 * *'
+  workflow_dispatch: # 允许手动点击运行
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 必须赋予写入权限，否则无法更新仓库文件
+      
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: 🚀 Run UA Factory Generator
+      run: python scripts/ua_generator.py
+
+    - name: 📤 Commit and Push to Main
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/user_agents.txt
+        # 只有在文件内容确实发生变化时才执行提交
+        git diff --quiet && git diff --staged --quiet || (git commit -m "chore(data): 🤖 自动机兵：刷新 4000 条绝对坐标指纹库" && git push)

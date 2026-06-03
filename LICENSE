@@ -1,0 +1,7 @@
+This repository combines multiple upstream modules with different copyleft
+licenses.
+
+- aimili-vpngate/ is distributed under GPL-3.0-or-later terms.
+- ip-sentinel/ is distributed under AGPL-3.0 terms.
+
+See LICENSES/GPL-3.0.txt and LICENSES/AGPL-3.0.txt for the full license texts.

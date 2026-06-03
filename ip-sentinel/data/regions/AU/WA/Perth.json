@@ -1,0 +1,55 @@
+{
+  "region_name": "Australia - Perth",
+  "google_module": {
+    "base_lat": -31.9545,
+    "base_lon": 115.8582,
+    "lang_params": "hl=en-AU&gl=AU",
+    "valid_url_suffix": "com.au"
+  },
+  "trust_module": {
+    "white_urls": [
+      "https://www.bom.gov.au/",
+      "https://news.google.com/rss/articles/CBMitgFBVV95cUxQSG44UzJRb0h5dDBtd0d6dlViazNHZ0VvdDRUQTZtMU0yMy00N0JvWTVTWG1GdWxkLWhOOFNQTFJGaF81RmpKdjZWaWJXU2t5N0VEMVIxaWVUVlh3cTViNFN6RGNkOXJpRnJjTldaTU1BOEVpRjk2ZFlaRUVXeVMyQUsyWjFrMEJNZ2dKS2hXMXBkZGpoMjIzUHhHc2ZoMEJwbWYtcE5uYTgyMW5tU1BCV3NHcm5kQQ?oc=5",
+      "https://news.google.com/rss/articles/CBMilwFBVV95cUxOR3Rjb09Id01tY3VaSDVCcDByYjg4WWZBb2diT0xUTm1PcFpuUjhqM2tOT2JoMDNqc0tCYndINWNrYXFOLWtPX1dCelRZM2EweTVNdF91ekt3X2o3MU9hRmVPVVdja1drWXVVa3FsbmxpWHdablF3SHIyMlQxTUNrUXNNVDJ0SmhrakFNMDZkSzlCeHlwd29v?oc=5",
+      "https://news.google.com/rss/articles/CBMikgFBVV95cUxPbDFDVDFjREFnOWVTZ3RVbm53dEJLLXl0OFhrb0tCOTkxR1YzU3R3RFFoYzNMRkJISk1uV1kyVnZVUjhQS3UwUllRRHhoOVJFeE9WYmdtekpxckt3MHhqSGNYRjNnS1RuemJfLXRMYkNBR0duTUZIdlltclRraTRXQXlpQlRtdWVwX01iT0ViWVNhdw?oc=5",
+      "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPRGR5a01jQlJZWkRWT0pzTGNKMkdqTnBCQU94UE1lSUZodHYwcmUxczNZR0VsVmR0ZFVyWmJxMTVUdFVLa3RpVkxEdUp5ZFRzLUtwMXFEaTlDQjlnaXpraTIwbXJCU3lxTXp5VVJIYjE5NlF0ajZZQ2tBbllJM0dIS1NlQkxKSzlrWEdMTHZVcERubFdSalpsTG14bGowRXZYTUk0V1BjdEt4c3FNbDJkSDA0VGh0YkhfeXowRk4tSVA3YWViSy1janl0YWEzTnNPY3FKMzBn?oc=5",
+      "https://my.gov.au/",
+      "https://news.google.com/rss/articles/CBMihgFBVV95cUxQOXZlaEhzWkpvUEV6Rzd6aVhzTmd5YUtIcjhQX3I1MXdtOUFmeWxfZkV2aHptTkpXVldrUU5aQ0NVNnNIbXF0dXZ1TUV6UTFZNVhZS21jc1BiRC1ESGlaZDNOeXpfVjJlZHZjYnhJM1hRbUFDZ3d4TnZzOEozVTRuQXV2b1p2dw?oc=5",
+      "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNdEJDQWQwTjVFS2lLSVdSWDB4U0tsdmlsNmY1aHFLU2RrenFXSVZQS1hibVB4eTVXdnkwS0RPaTBDNl9tVmV3a0RWWkRweDZFcmREN0o2R0VaQmY5TExIRWRqUFp5aElHWGtMNTNzOWJKVnVFLXB6VjNhd1ZpY0dVLVdWLXJkVk01ZEItVEZvSkx1X01pdzZYcUwtZGxRM2stRmJfSmNXMWZqZw?oc=5",
+      "https://news.google.com/rss/articles/CBMixgFBVV95cUxNSTRhNjBqaWFGdEVEdTExNkVZZm90YnVHUXRqNkFySkYtRUtrZXZKOTVqb0Z1U3lpRUFHbzN0SWg0WUNPdWZRME5pcjRnY283VVpMVDNGS01oaDROZUFvN1ZwUmJwZzdTeVJQYlpRaEJqUU9UY19kR2lvOEV4cjFpWndQd1FvQXF2TG13T19YVGkwM09mRXlvamJPYWQ1ekZvQmNqZEo1ejVXNjVPbXhFdEZQMjFaS3hGalEydDh1dy1BYjhncFE?oc=5",
+      "https://news.google.com/rss/articles/CBMidEFVX3lxTE1zWnFOd2RRWHR5TTQ3WmpKeVl6bF9ITktuWWlWY3VTQ1NFM3VZUnFXaGIxcDdxTnVFWjY2bkI2TUtHM0wzb1NCVW1ZcVFVLXFGLWFEQmJRajJvNWxKc2dreVl6cmE5a1dnZ0RCcEZOT2ZvSnJ0?oc=5",
+      "https://news.google.com/rss/articles/CBMipwFBVV95cUxOTWhRYmwybmtfNWtYVnVncjU4aG8zbDBYUzBjVjJ1UWRlTjNoQUZ5WVRfNjRlUVk5SHRWU0xuR2V0Z1ZuQnZ6SU5ISm0zZVp6R1ZZVE9SMXlUOThiVTlnY0tubXppQ2k1OTVBUjZrTFhzQUtud3FPQ3ZGSjQ0dVpSbVlya25GYzYtNTEzYXhMS0djQ2twYkdabGRsX1Rxb0JNS19GaXppcw?oc=5",
+      "https://news.google.com/rss/articles/CBMirAFBVV95cUxQa3NaQ0Nqc0FIWUFjcXMwdVNUQVA3dkFGam91RjZGWlgzVGhWWlJrTHp3TFludGFBR2FhRW4tblhSS0VfakxWUkNhTW9jUDQtNkdub2l5Q2dBN2wwNkJSWF9aY3pJNC11aDQ2bFg2eGtrd29EZnJfTEUtdnRMZGtWYWJkLW5jdk5WS1JSeWNZUjVsWTBEaTBjSWY3dFFJNE0ydi1hd25aY05jV3FQ?oc=5",
+      "https://www.realestate.com.au/",
+      "https://news.google.com/rss/articles/CBMipgFBVV95cUxQZTN6VTVzVWJadW9rRmtqc2dvX0twUXBsTDdpS01YUjFRd045Y0N0NGxyempQS2RacXZ3RFJla2EtUjM3YnNqS093OEtZeDI3a1dVSThEaHM0VXBFT2NwT2dNcjlxYnlWdEZlZHJLellaOWZLcEl5aWN6VFdYMnZvZ0l1TzMzQVE2ZnJjSzFyZ3NobUdiNVhKa3pIbVpxOVc0NjNsZXV3?oc=5",
+      "https://news.google.com/rss/articles/CBMihwFBVV95cUxPUElRQTdXeVotUThlcC1Wa0x4dGhvYnE4ZlhKMURQbmRrbnJMZFZzcVp5dWJpQmlkV24yUVhxdDJDTS1KMWVFWXVhekNlZ0xzbWNzMWh4QmZ2V2dmRjg4dFhEMjhyZk5wOEpZV1JmQlYzY19iSnZkZzJpZ2RQeGVQT3JpYW1NZ0E?oc=5",
+      "https://news.google.com/rss/articles/CBMimAFBVV95cUxQZ2l3MGZCUDF1RkM1SVhzMTJIVjVuTFpLOXVYQk5kZWVURXZhb2NEenpQUkZSNDVFbkZEZW1uSi1kY2RIQXBQeGJ5UGN3QnU2a1ZtNzZUNTk4ODdLZHFsQnRFalhIY01wM0h0VHZuLUJmZTZKeUVvdXUyYUN5bkM1eGJnX3k1TFVtTUtDZHgzODg0c2xBaDB4NQ?oc=5",
+      "https://news.google.com/rss/articles/CBMihAFBVV95cUxNLU9mdjJ5UXhzUHBuTWNHYi1ycTdGWG1Tei1qSm1PbmJTcG43OEhHYWRBR21FM215T29mUUpILXJueGFyZzhRVmlNa21rdjRXcGdWaEhwWEJtYmZKcXM2ZnJoc0lJRl8tZ2N0RGtzU2dvYndtRC11bHNVQ2s2RThRZjZqOXM?oc=5",
+      "https://www.commbank.com.au/",
+      "https://news.google.com/rss/articles/CBMijwFBVV95cUxPUi1VMUNtNzJfZUhoYllQU2pTdTB3OVRfcElnbWtJV2QwSU1WSm9tNnk4a0hwcm1zUHZ2TG8tNXBJSTJOeDZjdEhZRVhYMlhzN00wS0cxMWFuelkyWVlFM0tQSk8yUTFaYzhHV2VTNWZDcnB2eDBNbFcxa3pqcnZUQTlRSnJyVVFfMVVLRVpFYw?oc=5",
+      "https://news.google.com/rss/articles/CBMidkFVX3lxTE9KQ1ZMRlE0OGl3Y0I0VmZzYWJ3UXhqbVVJeTc5WTVNYVpGX3Z3YkxRMm9HaDFiVWpMNTVwa0hSUTJXMTVQVF91NFBiUlZ5UUxtVUhiNFozaXgxZnNlX0tjd2VFd296QTgxYnhaN2NFSDN4d3VLdGc?oc=5",
+      "https://news.google.com/rss/articles/CBMiigFBVV95cUxPT19lZklOenpnVWxnVzJaZzlHczlmbG5kelloUzljSU9GbmY2MkJUQnhhNEVFcWR5Q3VaNFN2RHJSTGRmMTRuU2J5NTh6SGxaUEhYenJzMnVOdExIUWE2Vm4zQlFwandvbHEzYlZSTThpVWxHVDVPd09jU1AyMXNLWFRJalRhQjZoRnc?oc=5",
+      "https://news.google.com/rss/articles/CBMitAFBVV95cUxOUUhId1pUVDg1VFh5LW5Qemd2VmdSb1dCWmdwcDN4b2stMkwtcFA1NXZsUDAyZU1BdUdnN2cwWGJScS1aREJmSlFCUHNfakRBWGRyeVBSYjg5bWpoSDNpdDBXbG4wRjRscUpkNGpQUkJDTXgxeVcxX3pZOXJlS1JHaEFvZjQwT0dVcjhqTFBYRXFabkVZY01KYTBVN2tJRWFPSHF3R0p2UDQtOTl1cHA4aEE5TXc?oc=5",
+      "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNa0ozVnlJLWFuNjRWNGRZY053QjhDRkNMOVpPNDNmeW5XV19rWkdLaENYV1R6SURReHRnWERmWXJGS1dWQlB4QUNxMFVROUpnN1ljTzJsSmo2cjJlenB0RDE0amtWUkVubkRucTczT0FmM2FYWkNqbEQ4aEg2ODhrUVJiZ3RlTFU1?oc=5",
+      "https://news.google.com/rss/articles/CBMi9wFBVV95cUxPRElNWkxjUDd0WUhvWXJ1VDZEOVBsb3R4V3VIcm1tcHRKMFd5MHNxSWNjMkozdFRVVVY3MjdPOUp4cE5PSjcyUHlNQkhSYW1LMVBwQ0lBa0VkcUxRSVVRQ3p4T1pUU2xUTjA2TS11ZEtNb1ZHWXJ4ZENGVVZ5VURNLVZta2N5YmtmTWxqWWtUTEZjLUdackdpaUxrd3o3aThldThDNWQtS180NmV3SVlzRE5GSlVMZGhfaVUzV2R4SVlNbHBsUkp1d2VpcmRoQ1JYc0lMdk5leHYtOEdCUktweFlIWV9USDl5TVl2YzV6WTc4NUM3ekRR?oc=5",
+      "https://news.google.com/rss/articles/CBMie0FVX3lxTE9oY3lFR3ZsVXpjZGpaa2swSnNmd1MxZ2o2b29mcjFxeHZoWnlQaHNQanVpcUlYNG43X3VOWHlVNmlmRjlGS092ZlBqS3VYQ2RLTXRPckZVMFNOYy1QWVRMWkpwSTJ5R1FsUFltNW9odnlrejN4ZXFERnFFdw?oc=5",
+      "https://news.google.com/rss/articles/CBMioAFBVV95cUxNMW5BcVJ0aks1bkt6WGRpXzZIaHNCdUJUUnZSc3JQX3ZpOFVGU0JkQzRwQ1VaZzBzY2pPMTlVVlItWFZoWE9ycmlWZFdfUFdqbDd6cHozUkxqUWhZVjhpUmpBV2FjaldvVWFpQUxMdEJoemZzMnhHaHlPd3MwWGpVVUFfS3ZLdTJjdUpQei1Kd3pwSEJIVklXa3Q0NGExOUpz?oc=5",
+      "https://www.bunnings.com.au/",
+      "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPSVJjOGVOeEJJSVVLaVJfRGY2a3ozZVlUUktuOEN6MGwtc3h0Um5yNmhFMlg3ZHR3UDhwTWVCM05LTGx0dlJld2Z6Uml0WTlsOV9TS3ZSU3oxa21sU2RWbkhsVWJuckdCRFFmUjFJZEVIT3B6OGMtYVJuc21MNG51b0pZTDd6MVE4QmhfUUtkOHFZTnhPNjd3V2FUdTdwanpyLW5OTTJkdTZrVF81S3IxbG1FNGpxdWZRM1diaFhCc1dDYk1JTWtxd09TdUp3NkhV0gHWAUFVX3lxTE9DZjIzQUJkOGZGckQtSjhBMGFJN0xBaFluUEF2cDFyWFItdXJhTkhHazBoLS1pcjJUOTRPZF9NZjhmM1V5OWNIYUpCT1lkRXdsNlpOSmRlU3hSazV6bUhNYkpEemloelVfQ2pTekdocHlJbG9IZjZ2bHc5ZEd2a0VFdzFEME1PUl9kUkxpYkprNWNSZjVxV29TMDZITXJXZGxxMmZDZ3A0NmxmRnpqVmQ5eGxMNWNUbnV6WlVwOVlpOWFfX3hCWWcwOF9DOGRZb1VkeUl1NUE?oc=5",
+      "https://news.google.com/rss/articles/CBMipAFBVV95cUxNWmktYTg4eWZxYVlZYXlVdnhFN0FhM2NaRW81Ui1ldklFTWtrNTM3azJHb2ZYcGdxOEl2Z25JMXc2ZnpfNTBtTmd6YmdIcnlYSEF0QnIyTmVHYm9kT3NwUlo5aVFmd21PY1hEQXhzRHpDZldBWG1xeUtEbjV6TVE4VUlxN3NoTjVQZkYxUmpxWHRFSmNpTlhIeUtJejl0WUl0OTlTMg?oc=5",
+      "https://news.google.com/rss/articles/CBMisgFBVV95cUxNWTBKM2o5OFRvQ2VGbEl0MHk5VWhPTEJwZ3prMlR1c1ZadDVDaVlXRFlueDcxbDctN1o2dElSNUc2U0FqWVZIdHVDUzlUSkprcFduNURwRmN4NW9CN1FhVjlmbGt3cmc3TWhiUXFaeE1Vbmk3UW5lQ3hSTzhGYnc5SzJUVUlOeFBPVnJoN2luVE5jNzZGTEpJcW42NWdOZVItNmJyUXdOZV9PWFdjYmh6THFB?oc=5"
+    ],
+    "static_urls": [
+      "https://www.ato.gov.au/",
+      "https://www.bunnings.com.au/",
+      "https://www.bom.gov.au/",
+      "https://my.gov.au/",
+      "https://www.woolworths.com.au/",
+      "https://www.realestate.com.au/",
+      "https://www.seek.com.au/",
+      "https://www.amazon.com.au/",
+      "https://www.coles.com.au/",
+      "https://www.commbank.com.au/"
+    ]
+  }
+}

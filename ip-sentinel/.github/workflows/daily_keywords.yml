@@ -1,0 +1,52 @@
+name: Daily Data Factory
+
+on:
+  schedule:
+    # 每天 UTC 03:00 执行，为各节点全天随机拉取准备好弹药
+    - cron: '0 3 * * *'
+  workflow_dispatch: 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Execute Trends Engine (搜索词库)
+        run: python scripts/fetch_trends.py
+
+      - name: Execute Trust URL Engine (活体新闻流融合)
+        run: python scripts/fetch_trust_urls.py
+
+      - name: Commit and Push All Data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 一揽子添加搜索词库和地区白名单的变化
+          git add data/keywords/
+          git add data/regions/
+          
+          # 防御机制：如果没有新数据，就静默退出，不产生空提交
+          if git diff --staged --quiet; then
+            echo "No changes, skipping."
+            exit 0
+          fi
+          
+          # 策略：将两路数据的更新合并为一个原子提交
+          git commit -m "chore(data): 🤖 自动机兵：同步全战区热点词库与活体新闻流 [$(date +'%Y-%m-%d')]"
+          git push origin main
