@@ -48,13 +48,11 @@ echo -e "${BLUE}==========================================================${PLAI
 
 # 3. Configure GitHub Repository URL
 DEFAULT_USER="tpxcer"
-DEFAULT_REPO="aimili-sentinel"
-DEFAULT_SUBDIR="aimili-vpngate"
+DEFAULT_REPO="aimili-vpngate"
 
 # Allow custom repository override via command line arguments
 GITHUB_USER="${1:-${DEFAULT_USER}}"
 GITHUB_REPO="${2:-${DEFAULT_REPO}}"
-REPO_SUBDIR="${3:-${DEFAULT_SUBDIR}}"
 
 GITHUB_URL="https://github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
@@ -82,8 +80,8 @@ elif [ "$PKG_MGR" = "dnf" ] || [ "$PKG_MGR" = "yum" ]; then
 fi
 
 # 4. Clone or pull the repository
-REPO_DIR="/opt/aimili-sentinel"
-INSTALL_DIR="${REPO_DIR}/${REPO_SUBDIR}"
+REPO_DIR="/opt/aimili-vpngate"
+INSTALL_DIR="${REPO_DIR}"
 # 默认部署分支（在 bate 分支设为 bate；在 main 分支设为 main）
 DEFAULT_DEPLOY_BRANCH="main"
 
@@ -132,7 +130,7 @@ else
 fi
 
 if [ ! -f "${INSTALL_DIR}/vpngate_manager.py" ]; then
-    echo -e "${RED}错误: 未找到 ${INSTALL_DIR}/vpngate_manager.py，请检查仓库子目录 ${REPO_SUBDIR} 是否正确。${PLAIN}"
+    echo -e "${RED}错误: 未找到 ${INSTALL_DIR}/vpngate_manager.py，请检查仓库是否完整。${PLAIN}"
     exit 1
 fi
 
@@ -197,9 +195,10 @@ import shutil
 import re
 import urllib.parse
 
-REPO_DIR = "/opt/aimili-sentinel"
-INSTALL_DIR = "/opt/aimili-sentinel/aimili-vpngate"
-LOG_FILE = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/vpngate.log"
+REPO_DIR = "/opt/aimili-vpngate"
+INSTALL_DIR = REPO_DIR
+DATA_DIR = os.path.join(INSTALL_DIR, "vpngate_data")
+LOG_FILE = os.path.join(DATA_DIR, "vpngate.log")
 
 def generate_random_password():
     import random
@@ -217,7 +216,7 @@ def generate_random_suffix():
 
 def load_ui_cfg():
     import json
-    path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/ui_auth.json"
+    path = os.path.join(DATA_DIR, "ui_auth.json")
     cfg = {
         "host": "::",
         "port": 8787,
@@ -240,7 +239,7 @@ def load_ui_cfg():
 
 def save_ui_cfg(cfg):
     import json
-    path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/ui_auth.json"
+    path = os.path.join(DATA_DIR, "ui_auth.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     try:
         with open(path, "w", encoding="utf-8") as f:
@@ -300,7 +299,7 @@ def build_domain_url(cfg):
 
 def load_state():
     import json
-    path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/state.json"
+    path = os.path.join(DATA_DIR, "state.json")
     state = {"active_openvpn_node_id": "", "last_check_message": "", "is_connecting": False}
     if os.path.exists(path):
         try:
@@ -314,7 +313,7 @@ def load_state():
 
 def get_active_node_info():
     import json
-    path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/nodes.json"
+    path = os.path.join(DATA_DIR, "nodes.json")
     state = load_state()
     active_id = state.get("active_openvpn_node_id")
     if not active_id:
@@ -354,7 +353,7 @@ def ping_ip(ip):
         return "无法连接"
 
 def get_public_ip():
-    path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/public_ip.txt"
+    path = os.path.join(DATA_DIR, "public_ip.txt")
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -591,7 +590,7 @@ def update_service():
             if not os.path.exists(".git"):
                 print("错误: 当前安装目录不是 Git 仓库，无法通过 Git 更新。")
                 print("可执行以下命令强制重新安装最新版本：")
-                print("bash -c \"$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/main/aimili-vpngate/install.sh)\"")
+                print("bash -c \"$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-vpngate/main/install.sh)\"")
                 time.sleep(3)
                 return
             
