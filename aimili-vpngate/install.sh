@@ -575,6 +575,13 @@ def show_logs():
         print(f"日志文件不存在: {LOG_FILE}")
         time.sleep(2)
 
+def prompt_input(prompt, default=""):
+    try:
+        return input(prompt).strip()
+    except EOFError:
+        print(default, flush=True)
+        return default
+
 def update_service():
     print("正在获取远程更新并检测版本...", flush=True)
     if os.path.exists(REPO_DIR):
@@ -606,14 +613,14 @@ def update_service():
             
             if local_commit == remote_commit:
                 print("\n【版本状态】当前已是最新版本，无需更新！")
-                override = input("是否强制重新拉取代码并覆盖安装？(y/N): ").strip().lower()
+                override = prompt_input("是否强制重新拉取代码并覆盖安装？(y/N): ", "n").lower()
                 if override != 'y':
                     print("已取消更新。")
                     time.sleep(1.5)
                     return
             else:
                 print(f"\n【检测到更新】本地版本: {local_commit[:8]}，远程最新版本: {remote_commit[:8]}")
-                confirm = input("是否确认开始更新并重启服务？(Y/n): ").strip().lower()
+                confirm = prompt_input("是否确认开始更新并重启服务？(Y/n): ", "y").lower()
                 if confirm not in ('', 'y', 'yes'):
                     print("已取消更新。")
                     time.sleep(1.5)
