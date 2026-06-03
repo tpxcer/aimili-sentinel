@@ -34,6 +34,56 @@ IP-Sentinel：
 - Agent 安装路径：`/opt/ip_sentinel`
 - Master 安装路径：`/opt/ip_sentinel_master`
 
+## IP-Sentinel 配置说明
+
+IP-Sentinel 分为 Master 和 Agent 两种角色：
+
+- Master：Telegram 私有机器人控制端，用来管理多台 Agent
+- Agent：部署在 VPS 上的检测节点，负责 IP 质量、区域、可信站点和趋势巡检
+
+推荐先部署 Master，再部署 Agent。只想检测单台 VPS 时，也可以只部署 Agent。
+
+Master 配置时需要填写：
+
+- Telegram Bot Token
+- 是否允许 OTA 重构，建议默认 `y`
+- 司令部展示别名，例如 `台湾主控`
+
+Agent 配置时需要填写：
+
+- 目标地区：洲、国家、省/州、城市
+- 是否接入 Master，建议 `y`
+- Telegram Bot Token
+- Telegram Chat ID
+- 是否允许 OTA，建议 `y`
+- Webhook 监听端口，通常直接回车使用推荐端口
+- 节点展示别名，例如 `台湾节点`
+
+Agent 配置文件路径：
+
+```bash
+/opt/ip_sentinel/config.conf
+```
+
+Master 配置文件路径：
+
+```bash
+/opt/ip_sentinel_master/master.conf
+```
+
+常用服务命令：
+
+```bash
+systemctl restart ip-sentinel-master.service
+systemctl restart ip-sentinel-agent-daemon.service
+systemctl restart ip-sentinel-runner.timer ip-sentinel-updater.timer ip-sentinel-report.timer
+systemctl status ip-sentinel-agent-daemon.service --no-pager
+systemctl list-timers | grep ip-sentinel
+bash /opt/ip_sentinel/core/runner.sh
+```
+
+如需重新配置 Agent，重新运行 Agent 安装命令；当提示是否按原配置平滑升级时选择 `n`，即可重新进入配置流程。
+
 ## 本次改版
 
 - 合并 `aimili-vpngate` 与 `IP-Sentinel` 到一个仓库

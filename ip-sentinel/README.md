@@ -31,6 +31,84 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/m
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/main/ip-sentinel/master/install_master.sh)"
 ```
 
+## 配置流程
+
+IP-Sentinel 分为两个角色：
+
+- Master：Telegram 私有机器人控制端，用于管理多台 Agent
+- Agent：部署在 VPS 上的检测节点，用于执行 IP 质量、Google 区域、可信站点和趋势巡检
+
+推荐顺序：
+
+1. 先部署 Master
+2. 再部署一台或多台 Agent
+
+只想检测当前 VPS 时，也可以只部署 Agent。
+
+### Master 配置
+
+运行 Master 安装命令后，按提示填写：
+
+- Telegram Bot Token
+- 是否允许司令部接收 OTA 重构指令，建议默认 `y`
+- 司令部展示别名，例如 `台湾主控`
+
+Master 服务命令：
+
+```bash
+systemctl restart ip-sentinel-master.service
+systemctl status ip-sentinel-master.service --no-pager
+```
+
+Master 配置文件：
+
+```bash
+/opt/ip_sentinel_master/master.conf
+```
+
+### Agent 配置
+
+运行 Agent 安装命令后，按提示填写：
+
+- 操作选择：选择部署边缘节点
+- 目标地区：洲、国家、省/州、城市
+- 是否接入 Master，建议 `y`
+- Telegram Bot Token
+- 是否允许 OTA，建议 `y`
+- Telegram Chat ID
+- Webhook 监听端口，通常直接回车使用推荐端口
+- 公网 IP，自动检测正确时直接使用；检测错误时手动填写
+- 节点展示别名，例如 `台湾节点`
+
+Agent 配置文件：
+
+```bash
+/opt/ip_sentinel/config.conf
+```
+
+Agent 服务命令：
+
+```bash
+systemctl restart ip-sentinel-agent-daemon.service
+systemctl restart ip-sentinel-runner.timer ip-sentinel-updater.timer ip-sentinel-report.timer
+systemctl status ip-sentinel-agent-daemon.service --no-pager
+systemctl list-timers | grep ip-sentinel
+```
+
+手动执行一次检测：
+
+```bash
+bash /opt/ip_sentinel/core/runner.sh
+```
+
+重新配置 Agent：
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/main/ip-sentinel/install.sh)"
+```
+
+当安装器提示是否按原配置平滑升级时选择 `n`，即可重新进入配置流程。
+
 ## 默认路径
 
 - Agent：`/opt/ip_sentinel`
