@@ -172,7 +172,10 @@ def load_ui_config() -> dict[str, Any]:
             "password": "",
             "host": "::",
             "port": 8787,
-            "domain": ""
+            "domain": "",
+            "domain_scheme": "https",
+            "domain_public_port": 443,
+            "domain_reverse_proxy": True
         }
         updated = False
         if auth_file.exists():
@@ -294,6 +297,9 @@ def get_state() -> dict[str, Any]:
     state["routing_mode"] = ui_cfg.get("routing_mode", "auto")
     state["force_country"] = ui_cfg.get("force_country", "")
     state["domain"] = ui_cfg.get("domain", "")
+    state["domain_scheme"] = ui_cfg.get("domain_scheme", "https")
+    state["domain_public_port"] = ui_cfg.get("domain_public_port", 443)
+    state["domain_reverse_proxy"] = ui_cfg.get("domain_reverse_proxy", True)
     
     return state
 

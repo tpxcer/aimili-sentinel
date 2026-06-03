@@ -197,6 +197,7 @@ import shutil
 import re
 import urllib.parse
 
+REPO_DIR = "/opt/aimili-sentinel"
 INSTALL_DIR = "/opt/aimili-sentinel/aimili-vpngate"
 LOG_FILE = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/vpngate.log"
 
@@ -217,7 +218,16 @@ def generate_random_suffix():
 def load_ui_cfg():
     import json
     path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/ui_auth.json"
-    cfg = {"host": "::", "port": 8787, "secret_path": "EJsW2EeBo9lY", "password": "", "domain": ""}
+    cfg = {
+        "host": "::",
+        "port": 8787,
+        "secret_path": "EJsW2EeBo9lY",
+        "password": "",
+        "domain": "",
+        "domain_scheme": "https",
+        "domain_public_port": 443,
+        "domain_reverse_proxy": True,
+    }
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -279,10 +289,13 @@ def build_domain_url(cfg):
     domain = normalize_domain(cfg.get("domain", ""))
     if not domain:
         return ""
-    port = int(cfg.get("port", 8787) or 8787)
+    scheme = str(cfg.get("domain_scheme") or "https").lower()
+    if scheme not in ("http", "https"):
+        scheme = "https"
+    public_port = int(cfg.get("domain_public_port") or (443 if scheme == "https" else 80))
     secret_path = cfg.get("secret_path", "EJsW2EeBo9lY")
-    port_part = "" if port == 80 else f":{port}"
-    return f"http://{domain}{port_part}/{secret_path}/"
+    port_part = "" if (scheme == "https" and public_port == 443) or (scheme == "http" and public_port == 80) else f":{public_port}"
+    return f"{scheme}://{domain}{port_part}/{secret_path}/"
 
 def load_state():
     import json
@@ -564,11 +577,13 @@ def show_logs():
 
 def update_service():
     print("正在获取远程更新并检测版本...", flush=True)
-    if os.path.exists(INSTALL_DIR):
+    if os.path.exists(REPO_DIR):
         try:
-            os.chdir(INSTALL_DIR)
+            os.chdir(REPO_DIR)
             if not os.path.exists(".git"):
                 print("错误: 当前安装目录不是 Git 仓库，无法通过 Git 更新。")
+                print("可执行以下命令强制重新安装最新版本：")
+                print("bash -c \"$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/main/aimili-vpngate/install.sh)\"")
                 time.sleep(3)
                 return
             
@@ -612,14 +627,14 @@ def update_service():
             subprocess.run(["find", ".", "-type", "d", "-name", "__pycache__", "-exec", "rm", "-rf", "{}", "+"], check=False)
             
             print("代码拉取成功，正在重新运行安装脚本...", flush=True)
-            subprocess.run(["bash", "install.sh"])
+            subprocess.run(["bash", os.path.join(INSTALL_DIR, "install.sh")])
             print("更新已完成！")
             time.sleep(2)
         except Exception as e:
             print(f"更新失败: {e}")
             time.sleep(4)
     else:
-        print(f"未找到安装目录: {INSTALL_DIR}")
+        print(f"未找到安装目录: {REPO_DIR}")
         time.sleep(2)
 
 def uninstall_service():
@@ -720,12 +735,15 @@ def configure_domain():
         print(f"当前域名: {curr_domain_text}")
         if curr_domain:
             print(f"当前域名访问地址: {build_domain_url(cfg)}")
+            mode_text = "反代模式" if cfg.get("domain_reverse_proxy", True) else "直连端口模式"
+            print(f"当前访问模式: {mode_text}")
         print("-------------------------------------------------------")
         print("  [1] 设置/修改访问域名")
-        print("  [2] 清除访问域名")
-        print("  [3] 返回主菜单")
+        print("  [2] 切换访问模式 (反代/直连)")
+        print("  [3] 清除访问域名")
+        print("  [4] 返回主菜单")
         print("=======================================================")
-        print("请直接输入数字键 [1-3] 快速执行：", end="", flush=True)
+        print("请直接输入数字键 [1-4] 快速执行：", end="", flush=True)
 
         key = getch()
         if key == '1':
@@ -739,23 +757,57 @@ def configure_domain():
                 time.sleep(2)
                 continue
             cfg["domain"] = domain
-            if cfg.get("host") in ("127.0.0.1", "localhost", "::1"):
-                sel = input("当前后台仅本地监听，域名无法访问。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
+            mode = input("访问模式: [1] 反代 HTTPS (推荐)  [2] 直连端口 HTTP，默认1: ").strip()
+            if mode == "2":
+                cfg["domain_reverse_proxy"] = False
+                cfg["domain_scheme"] = "http"
+                cfg["domain_public_port"] = int(cfg.get("port", 8787) or 8787)
+                if cfg.get("host") in ("127.0.0.1", "localhost", "::1"):
+                    sel = input("直连模式需要公网监听。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
+                    if sel not in ("n", "no"):
+                        cfg["host"] = "::"
+            else:
+                cfg["domain_reverse_proxy"] = True
+                cfg["domain_scheme"] = "https"
+                cfg["domain_public_port"] = 443
+                sel = input("反代通常建议后端仅本地监听 127.0.0.1。是否自动切换? [Y/n]: ").strip().lower()
                 if sel not in ("n", "no"):
-                    cfg["host"] = "::"
+                    cfg["host"] = "127.0.0.1"
             save_ui_cfg(cfg)
             print("域名访问配置已保存。")
             print(f"域名访问地址: {build_domain_url(cfg)}")
-            print("请确认域名 DNS 已解析到本 VPS，并在安全组/防火墙放行网页管理端口。")
+            if cfg.get("domain_reverse_proxy", True):
+                print(f"请确认反代上游指向 http://127.0.0.1:{cfg.get('port', 8787)}，并保留原始请求路径。")
+            else:
+                print("请确认域名 DNS 已解析到本 VPS，并在安全组/防火墙放行网页管理端口。")
             ask_restart()
             break
         elif key == '2':
+            if not normalize_domain(cfg.get("domain", "")):
+                print("请先设置域名。")
+                time.sleep(1)
+                continue
+            cfg["domain_reverse_proxy"] = not bool(cfg.get("domain_reverse_proxy", True))
+            if cfg["domain_reverse_proxy"]:
+                cfg["domain_scheme"] = "https"
+                cfg["domain_public_port"] = 443
+                cfg["host"] = "127.0.0.1"
+            else:
+                cfg["domain_scheme"] = "http"
+                cfg["domain_public_port"] = int(cfg.get("port", 8787) or 8787)
+                if cfg.get("host") in ("127.0.0.1", "localhost", "::1"):
+                    cfg["host"] = "::"
+            save_ui_cfg(cfg)
+            print(f"访问模式已切换，当前域名访问地址: {build_domain_url(cfg)}")
+            ask_restart()
+            break
+        elif key == '3':
             cfg["domain"] = ""
             save_ui_cfg(cfg)
             print("域名访问配置已清除。")
             time.sleep(1)
             break
-        elif key == '3' or key == 'q' or key == '\x03':
+        elif key == '4' or key == 'q' or key == '\x03':
             break
 
 def configure_port():
@@ -1069,6 +1121,9 @@ if [ ! -f "$AUTH_FILE" ]; then
     # Initialize defaults
     UI_PORT=8787
     UI_DOMAIN=""
+    UI_DOMAIN_SCHEME="https"
+    UI_DOMAIN_PUBLIC_PORT=443
+    UI_DOMAIN_REVERSE_PROXY="true"
     # generate random secret suffix (12 chars alphanumeric)
     SECRET_PATH=$(python3 -c "import random, string; print(''.join(random.choices(string.ascii_letters + string.digits, k=12)))")
     # generate random password
@@ -1162,6 +1217,12 @@ ok=bool(re.match(r'^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0
 print(value if ok else '')" "$input_domain")
             if [ -n "$normalized_domain" ]; then
                 UI_DOMAIN="$normalized_domain"
+                read -p "访问模式: [1] 反代 HTTPS (推荐)  [2] 直连端口 HTTP，默认1: " input_domain_mode
+                if [ "$input_domain_mode" = "2" ]; then
+                    UI_DOMAIN_SCHEME="http"
+                    UI_DOMAIN_PUBLIC_PORT="$UI_PORT"
+                    UI_DOMAIN_REVERSE_PROXY="false"
+                fi
                 break
             else
                 echo -e "${RED}输入错误: 域名格式不正确，请输入类似 vpn.example.com 的域名。${PLAIN}"
@@ -1178,7 +1239,10 @@ cfg = {
     'secret_path': '$SECRET_PATH',
     'username': '$UI_USERNAME',
     'password': '$UI_PASSWORD',
-    'domain': '$UI_DOMAIN'
+    'domain': '$UI_DOMAIN',
+    'domain_scheme': '$UI_DOMAIN_SCHEME',
+    'domain_public_port': int('$UI_DOMAIN_PUBLIC_PORT'),
+    'domain_reverse_proxy': '$UI_DOMAIN_REVERSE_PROXY' == 'true'
 }
 with open('$AUTH_FILE', 'w', encoding='utf-8') as f:
     json.dump(cfg, f, ensure_ascii=False, indent=2)

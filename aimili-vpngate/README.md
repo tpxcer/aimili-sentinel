@@ -34,6 +34,25 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/m
 - `ml domain`：配置域名访问地址
 - `ml port`：配置 Web 后台端口与代理端口
 
+反代模式：
+
+- 推荐在 `ml domain` 中选择“反代 HTTPS”
+- 反代上游指向：`http://127.0.0.1:8787`
+- 外部访问地址形如：`https://vpn.example.com/安全后缀/`
+- 反代需要保留原始路径，不要把安全后缀路径改写掉
+
+Nginx 示例：
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8787;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
 ## 默认端口
 
 - Web 管理后台：`8787`
