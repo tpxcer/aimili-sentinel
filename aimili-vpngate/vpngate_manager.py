@@ -1613,7 +1613,8 @@ LOGIN_HTML = r"""<!DOCTYPE html>
             const secureAttr = window.location.protocol === "https:" ? "; Secure" : "";
             document.cookie = `session_fallback=${encodeURIComponent(data.session)}; Path=${data.cookie_path}; SameSite=Lax; Max-Age=2592000${secureAttr}`;
           }
-          window.location.replace("./");
+          const tokenParam = data.session ? `?login_token=${encodeURIComponent(data.session)}` : "";
+          window.location.replace(`./${tokenParam}`);
         } else {
           errorText.textContent = data.error || "账号或密码不正确，请重新输入";
           errorText.style.display = "block";
@@ -4185,32 +4186,40 @@ class Handler(BaseHTTPRequestHandler):
                     k, v = item.split("=", 1)
                     cookies[k.strip()] = v.strip()
         
-        session_token = cookies.get("session") or cookies.get("session_fallback")
-        if not session_token:
+        session_tokens = [token for token in (cookies.get("session"), cookies.get("session_fallback")) if token]
+        if not session_tokens:
             return False
 
         expected_token = get_session_token(pwd, ui_cfg.get("username", "admin"))
-        if session_token == expected_token:
-            return True
+        for session_token in session_tokens:
+            if session_token == expected_token:
+                return True
             
         with lock:
-            exp_time = active_sessions.get(session_token)
-            if exp_time is not None and exp_time > time.time():
-                return True
+            for session_token in session_tokens:
+                exp_time = active_sessions.get(session_token)
+                if exp_time is not None and exp_time > time.time():
+                    return True
         return False
+
+    def send_session_cookies(self, token: str, cookie_path: str) -> None:
+        secure_attr = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" or isinstance(self.request, ssl.SSLSocket) else ""
+        self.send_header("Set-Cookie", f"session={token}; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=2592000{secure_attr}")
+        self.send_header("Set-Cookie", f"session_fallback={token}; Path={cookie_path}; SameSite=Lax; Max-Age=2592000{secure_attr}")
 
     def validate_path(self) -> str:
         secret_path = self.get_secret_path()
+        request_path = urllib.parse.urlsplit(self.path).path
         if not secret_path:
-            return self.path
-        if self.path == f"/{secret_path}":
+            return request_path
+        if request_path == f"/{secret_path}":
             self.send_response(HTTPStatus.FOUND)
             self.send_header("Location", f"/{secret_path}/")
             self.end_headers()
             return ""
         prefix = f"/{secret_path}/"
-        if self.path.startswith(prefix):
-            return "/" + self.path[len(prefix):]
+        if request_path.startswith(prefix):
+            return "/" + request_path[len(prefix):]
         self.send_response(HTTPStatus.NOT_FOUND)
         self.end_headers()
         return ""
@@ -4232,6 +4241,23 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         effective_path = self.validate_path()
         if effective_path == "": return
+
+        if effective_path in ("/", "/index.html"):
+            query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+            login_token = (query.get("login_token") or [""])[0]
+            if login_token:
+                ui_cfg = load_ui_config()
+                expected_token = get_session_token(ui_cfg.get("password", ""), ui_cfg.get("username", "admin"))
+                if login_token == expected_token:
+                    secret_path = self.get_secret_path()
+                    cookie_path = f"/{secret_path}/" if secret_path else "/"
+                    with lock:
+                        active_sessions[login_token] = time.time() + 30 * 24 * 3600
+                    self.send_response(HTTPStatus.FOUND)
+                    self.send_header("Location", f"/{secret_path}/" if secret_path else "/")
+                    self.send_session_cookies(login_token, cookie_path)
+                    self.end_headers()
+                    return
         
         if not self.is_authorized():
             if effective_path in ("/", "/index.html"):
@@ -4426,9 +4452,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_header("Content-Type", "application/json; charset=utf-8")
                     secret_path = self.get_secret_path()
                     cookie_path = f"/{secret_path}/" if secret_path else "/"
-                    secure_attr = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" or isinstance(self.request, ssl.SSLSocket) else ""
-                    self.send_header("Set-Cookie", f"session={token}; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=2592000{secure_attr}")
-                    self.send_header("Set-Cookie", f"session_fallback={token}; Path={cookie_path}; SameSite=Lax; Max-Age=2592000{secure_attr}")
+                    self.send_session_cookies(token, cookie_path)
                     self.end_headers()
                     self.wfile.write(json.dumps({"ok": True, "session": token, "cookie_path": cookie_path}).encode("utf-8"))
                 else:
