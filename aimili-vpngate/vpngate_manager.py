@@ -10,6 +10,7 @@ import re
 import select
 import shlex
 import socket
+import ssl
 import subprocess
 import threading
 import time
@@ -173,7 +174,7 @@ def load_ui_config() -> dict[str, Any]:
             "host": "::",
             "port": 8787,
             "domain": "",
-            "domain_scheme": "http",
+            "domain_scheme": "https",
             "domain_public_port": 8787,
             "domain_reverse_proxy": False
         }
@@ -202,6 +203,16 @@ def load_ui_config() -> dict[str, Any]:
                 pass
                 
         return config
+
+def get_direct_https_cert_paths(ui_cfg: dict[str, Any]) -> tuple[str, str]:
+    domain = str(ui_cfg.get("domain") or "").strip().strip("/")
+    cert_path = str(ui_cfg.get("tls_cert_path") or "")
+    key_path = str(ui_cfg.get("tls_key_path") or "")
+    if not cert_path and domain:
+        cert_path = f"/root/cert/{domain}/fullchain.pem"
+    if not key_path and domain:
+        key_path = f"/root/cert/{domain}/privkey.pem"
+    return cert_path, key_path
 
 # 初始化时优先从 ui_auth.json 加载保存的代理出站端口和网页端口配置以覆盖环境变量
 try:
@@ -297,7 +308,7 @@ def get_state() -> dict[str, Any]:
     state["routing_mode"] = ui_cfg.get("routing_mode", "auto")
     state["force_country"] = ui_cfg.get("force_country", "")
     state["domain"] = ui_cfg.get("domain", "")
-    state["domain_scheme"] = ui_cfg.get("domain_scheme", "http")
+    state["domain_scheme"] = ui_cfg.get("domain_scheme", "https")
     state["domain_public_port"] = ui_cfg.get("domain_public_port", state["port"])
     state["domain_reverse_proxy"] = ui_cfg.get("domain_reverse_proxy", False)
     
@@ -4415,7 +4426,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_header("Content-Type", "application/json; charset=utf-8")
                     secret_path = self.get_secret_path()
                     cookie_path = f"/{secret_path}/" if secret_path else "/"
-                    secure_attr = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" else ""
+                    secure_attr = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" or isinstance(self.request, ssl.SSLSocket) else ""
                     self.send_header("Set-Cookie", f"session={token}; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=2592000{secure_attr}")
                     self.send_header("Set-Cookie", f"session_fallback={token}; Path={cookie_path}; SameSite=Lax; Max-Age=2592000{secure_attr}")
                     self.end_headers()
@@ -4747,10 +4758,24 @@ def main() -> None:
     ui_cfg = load_ui_config()
     ui_host = ui_cfg.get("host", UI_HOST)
     ui_port = int(ui_cfg.get("port", UI_PORT))
+    ui_scheme = str(ui_cfg.get("domain_scheme") or "http").lower()
+    use_direct_https = ui_scheme == "https" and not bool(ui_cfg.get("domain_reverse_proxy", False))
+    protocol = "https" if use_direct_https else "http"
     
-    print(f"UI: http://{ui_host}:{ui_port}/", flush=True)
+    print(f"UI: {protocol}://{ui_host}:{ui_port}/", flush=True)
     print(f"Proxy: http://{LOCAL_PROXY_HOST}:{LOCAL_PROXY_PORT}", flush=True)
-    DualStackHTTPServer((ui_host, ui_port), Handler).serve_forever()
+    server = DualStackHTTPServer((ui_host, ui_port), Handler)
+    if use_direct_https:
+        cert_path, key_path = get_direct_https_cert_paths(ui_cfg)
+        if not cert_path or not key_path or not Path(cert_path).exists() or not Path(key_path).exists():
+            raise RuntimeError(
+                f"直连 HTTPS 已启用，但证书文件不存在。cert={cert_path or '未配置'}, key={key_path or '未配置'}"
+            )
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certfile=cert_path, keyfile=key_path)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+        print(f"UI HTTPS certificate: {cert_path}", flush=True)
+    server.serve_forever()
 
 if __name__ == "__main__":
     main()

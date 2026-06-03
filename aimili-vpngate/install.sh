@@ -224,7 +224,7 @@ def load_ui_cfg():
         "secret_path": "EJsW2EeBo9lY",
         "password": "",
         "domain": "",
-        "domain_scheme": "http",
+        "domain_scheme": "https",
         "domain_public_port": 8787,
         "domain_reverse_proxy": False,
     }
@@ -289,10 +289,11 @@ def build_domain_url(cfg):
     domain = normalize_domain(cfg.get("domain", ""))
     if not domain:
         return ""
-    scheme = str(cfg.get("domain_scheme") or "http").lower()
+    scheme = str(cfg.get("domain_scheme") or "https").lower()
     if scheme not in ("http", "https"):
-        scheme = "http"
-    public_port = int(cfg.get("domain_public_port") or (cfg.get("port", 8787) if scheme == "http" else 443))
+        scheme = "https"
+    default_public_port = 443 if cfg.get("domain_reverse_proxy", False) else int(cfg.get("port", 8787) or 8787)
+    public_port = int(cfg.get("domain_public_port") or default_public_port)
     secret_path = cfg.get("secret_path", "EJsW2EeBo9lY")
     port_part = "" if (scheme == "https" and public_port == 443) or (scheme == "http" and public_port == 80) else f":{public_port}"
     return f"{scheme}://{domain}{port_part}/{secret_path}/"
@@ -764,15 +765,15 @@ def configure_domain():
                 time.sleep(2)
                 continue
             cfg["domain"] = domain
-            mode = input("访问模式: [1] 直连端口 HTTP (推荐)  [2] 反代 HTTPS，默认1: ").strip()
-            if mode == "2":
+            mode = input("访问模式: [1] 直连端口 HTTPS (推荐)  [2] 直连端口 HTTP  [3] 反代 HTTPS，默认1: ").strip()
+            if mode == "3":
                 cfg["domain_reverse_proxy"] = True
                 cfg["domain_scheme"] = "https"
                 cfg["domain_public_port"] = 443
                 sel = input("反代通常建议后端仅本地监听 127.0.0.1。是否自动切换? [Y/n]: ").strip().lower()
                 if sel not in ("n", "no"):
                     cfg["host"] = "127.0.0.1"
-            else:
+            elif mode == "2":
                 cfg["domain_reverse_proxy"] = False
                 cfg["domain_scheme"] = "http"
                 cfg["domain_public_port"] = int(cfg.get("port", 8787) or 8787)
@@ -780,6 +781,15 @@ def configure_domain():
                     sel = input("直连模式需要公网监听。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
                     if sel not in ("n", "no"):
                         cfg["host"] = "::"
+            else:
+                cfg["domain_reverse_proxy"] = False
+                cfg["domain_scheme"] = "https"
+                cfg["domain_public_port"] = int(cfg.get("port", 8787) or 8787)
+                if cfg.get("host") in ("127.0.0.1", "localhost", "::1"):
+                    sel = input("直连模式需要公网监听。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
+                    if sel not in ("n", "no"):
+                        cfg["host"] = "::"
+                print(f"请确认 HTTPS 证书存在: /root/cert/{domain}/fullchain.pem 和 /root/cert/{domain}/privkey.pem")
             save_ui_cfg(cfg)
             print("域名访问配置已保存。")
             print(f"域名访问地址: {build_domain_url(cfg)}")
@@ -1128,7 +1138,7 @@ if [ ! -f "$AUTH_FILE" ]; then
     # Initialize defaults
     UI_PORT=8787
     UI_DOMAIN=""
-    UI_DOMAIN_SCHEME="http"
+    UI_DOMAIN_SCHEME="https"
     UI_DOMAIN_PUBLIC_PORT=8787
     UI_DOMAIN_REVERSE_PROXY="false"
     # generate random secret suffix (12 chars alphanumeric)
@@ -1224,8 +1234,12 @@ ok=bool(re.match(r'^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0
 print(value if ok else '')" "$input_domain")
             if [ -n "$normalized_domain" ]; then
                 UI_DOMAIN="$normalized_domain"
-                read -p "访问模式: [1] 直连端口 HTTP (推荐)  [2] 反代 HTTPS，默认1: " input_domain_mode
+                read -p "访问模式: [1] 直连端口 HTTPS (推荐)  [2] 直连端口 HTTP  [3] 反代 HTTPS，默认1: " input_domain_mode
                 if [ "$input_domain_mode" = "2" ]; then
+                    UI_DOMAIN_SCHEME="http"
+                    UI_DOMAIN_PUBLIC_PORT="$UI_PORT"
+                    UI_DOMAIN_REVERSE_PROXY="false"
+                elif [ "$input_domain_mode" = "3" ]; then
                     UI_DOMAIN_SCHEME="https"
                     UI_DOMAIN_PUBLIC_PORT=443
                     UI_DOMAIN_REVERSE_PROXY="true"

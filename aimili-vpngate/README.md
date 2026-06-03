@@ -34,13 +34,14 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/m
 - `ml domain`：配置域名访问地址
 - `ml port`：配置 Web 后台端口与代理端口
 
-域名直连端口模式：
+域名 HTTPS 直连端口模式：
 
-- 推荐在 `ml domain` 中选择“直连端口 HTTP”
-- 外部访问地址形如：`http://vpn.example.com:8787/安全后缀/`
+- 推荐在 `ml domain` 中选择“直连端口 HTTPS”
+- 外部访问地址形如：`https://vpn.example.com:8787/安全后缀/`
+- 证书默认读取：`/root/cert/域名/fullchain.pem` 与 `/root/cert/域名/privkey.pem`
 - 请确认域名 DNS 已解析到本 VPS，并在安全组/防火墙放行 Web 后台端口
 
-反代模式为可选项：
+HTTP 直连端口与反代模式为可选项：
 
 - 反代上游指向：`http://127.0.0.1:8787`
 - 外部访问地址形如：`https://vpn.example.com/安全后缀/`
