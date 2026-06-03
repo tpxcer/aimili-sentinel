@@ -224,9 +224,9 @@ def load_ui_cfg():
         "secret_path": "EJsW2EeBo9lY",
         "password": "",
         "domain": "",
-        "domain_scheme": "https",
-        "domain_public_port": 443,
-        "domain_reverse_proxy": True,
+        "domain_scheme": "http",
+        "domain_public_port": 8787,
+        "domain_reverse_proxy": False,
     }
     if os.path.exists(path):
         try:
@@ -289,10 +289,10 @@ def build_domain_url(cfg):
     domain = normalize_domain(cfg.get("domain", ""))
     if not domain:
         return ""
-    scheme = str(cfg.get("domain_scheme") or "https").lower()
+    scheme = str(cfg.get("domain_scheme") or "http").lower()
     if scheme not in ("http", "https"):
-        scheme = "https"
-    public_port = int(cfg.get("domain_public_port") or (443 if scheme == "https" else 80))
+        scheme = "http"
+    public_port = int(cfg.get("domain_public_port") or (cfg.get("port", 8787) if scheme == "http" else 443))
     secret_path = cfg.get("secret_path", "EJsW2EeBo9lY")
     port_part = "" if (scheme == "https" and public_port == 443) or (scheme == "http" and public_port == 80) else f":{public_port}"
     return f"{scheme}://{domain}{port_part}/{secret_path}/"
@@ -742,7 +742,7 @@ def configure_domain():
         print(f"当前域名: {curr_domain_text}")
         if curr_domain:
             print(f"当前域名访问地址: {build_domain_url(cfg)}")
-            mode_text = "反代模式" if cfg.get("domain_reverse_proxy", True) else "直连端口模式"
+            mode_text = "反代模式" if cfg.get("domain_reverse_proxy", False) else "直连端口模式"
             print(f"当前访问模式: {mode_text}")
         print("-------------------------------------------------------")
         print("  [1] 设置/修改访问域名")
@@ -764,8 +764,15 @@ def configure_domain():
                 time.sleep(2)
                 continue
             cfg["domain"] = domain
-            mode = input("访问模式: [1] 反代 HTTPS (推荐)  [2] 直连端口 HTTP，默认1: ").strip()
+            mode = input("访问模式: [1] 直连端口 HTTP (推荐)  [2] 反代 HTTPS，默认1: ").strip()
             if mode == "2":
+                cfg["domain_reverse_proxy"] = True
+                cfg["domain_scheme"] = "https"
+                cfg["domain_public_port"] = 443
+                sel = input("反代通常建议后端仅本地监听 127.0.0.1。是否自动切换? [Y/n]: ").strip().lower()
+                if sel not in ("n", "no"):
+                    cfg["host"] = "127.0.0.1"
+            else:
                 cfg["domain_reverse_proxy"] = False
                 cfg["domain_scheme"] = "http"
                 cfg["domain_public_port"] = int(cfg.get("port", 8787) or 8787)
@@ -773,17 +780,10 @@ def configure_domain():
                     sel = input("直连模式需要公网监听。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
                     if sel not in ("n", "no"):
                         cfg["host"] = "::"
-            else:
-                cfg["domain_reverse_proxy"] = True
-                cfg["domain_scheme"] = "https"
-                cfg["domain_public_port"] = 443
-                sel = input("反代通常建议后端仅本地监听 127.0.0.1。是否自动切换? [Y/n]: ").strip().lower()
-                if sel not in ("n", "no"):
-                    cfg["host"] = "127.0.0.1"
             save_ui_cfg(cfg)
             print("域名访问配置已保存。")
             print(f"域名访问地址: {build_domain_url(cfg)}")
-            if cfg.get("domain_reverse_proxy", True):
+            if cfg.get("domain_reverse_proxy", False):
                 print(f"请确认反代上游指向 http://127.0.0.1:{cfg.get('port', 8787)}，并保留原始请求路径。")
             else:
                 print("请确认域名 DNS 已解析到本 VPS，并在安全组/防火墙放行网页管理端口。")
@@ -794,7 +794,7 @@ def configure_domain():
                 print("请先设置域名。")
                 time.sleep(1)
                 continue
-            cfg["domain_reverse_proxy"] = not bool(cfg.get("domain_reverse_proxy", True))
+            cfg["domain_reverse_proxy"] = not bool(cfg.get("domain_reverse_proxy", False))
             if cfg["domain_reverse_proxy"]:
                 cfg["domain_scheme"] = "https"
                 cfg["domain_public_port"] = 443
@@ -1128,9 +1128,9 @@ if [ ! -f "$AUTH_FILE" ]; then
     # Initialize defaults
     UI_PORT=8787
     UI_DOMAIN=""
-    UI_DOMAIN_SCHEME="https"
-    UI_DOMAIN_PUBLIC_PORT=443
-    UI_DOMAIN_REVERSE_PROXY="true"
+    UI_DOMAIN_SCHEME="http"
+    UI_DOMAIN_PUBLIC_PORT=8787
+    UI_DOMAIN_REVERSE_PROXY="false"
     # generate random secret suffix (12 chars alphanumeric)
     SECRET_PATH=$(python3 -c "import random, string; print(''.join(random.choices(string.ascii_letters + string.digits, k=12)))")
     # generate random password
@@ -1224,11 +1224,11 @@ ok=bool(re.match(r'^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0
 print(value if ok else '')" "$input_domain")
             if [ -n "$normalized_domain" ]; then
                 UI_DOMAIN="$normalized_domain"
-                read -p "访问模式: [1] 反代 HTTPS (推荐)  [2] 直连端口 HTTP，默认1: " input_domain_mode
+                read -p "访问模式: [1] 直连端口 HTTP (推荐)  [2] 反代 HTTPS，默认1: " input_domain_mode
                 if [ "$input_domain_mode" = "2" ]; then
-                    UI_DOMAIN_SCHEME="http"
-                    UI_DOMAIN_PUBLIC_PORT="$UI_PORT"
-                    UI_DOMAIN_REVERSE_PROXY="false"
+                    UI_DOMAIN_SCHEME="https"
+                    UI_DOMAIN_PUBLIC_PORT=443
+                    UI_DOMAIN_REVERSE_PROXY="true"
                 fi
                 break
             else
