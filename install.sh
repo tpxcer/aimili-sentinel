@@ -1137,7 +1137,7 @@ if [ ! -f "$AUTH_FILE" ]; then
     # Initialize defaults
     UI_PORT=8787
     UI_DOMAIN=""
-    UI_DOMAIN_SCHEME="https"
+    UI_DOMAIN_SCHEME="http"
     UI_DOMAIN_PUBLIC_PORT=8787
     UI_DOMAIN_REVERSE_PROXY="false"
     # generate random secret suffix (12 chars alphanumeric)

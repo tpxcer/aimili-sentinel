@@ -174,7 +174,7 @@ def load_ui_config() -> dict[str, Any]:
             "host": "::",
             "port": 8787,
             "domain": "",
-            "domain_scheme": "https",
+            "domain_scheme": "http",
             "domain_public_port": 8787,
             "domain_reverse_proxy": False
         }
@@ -308,7 +308,7 @@ def get_state() -> dict[str, Any]:
     state["routing_mode"] = ui_cfg.get("routing_mode", "auto")
     state["force_country"] = ui_cfg.get("force_country", "")
     state["domain"] = ui_cfg.get("domain", "")
-    state["domain_scheme"] = ui_cfg.get("domain_scheme", "https")
+    state["domain_scheme"] = ui_cfg.get("domain_scheme", "http")
     state["domain_public_port"] = ui_cfg.get("domain_public_port", state["port"])
     state["domain_reverse_proxy"] = ui_cfg.get("domain_reverse_proxy", False)
     
@@ -4783,7 +4783,8 @@ def main() -> None:
     ui_host = ui_cfg.get("host", UI_HOST)
     ui_port = int(ui_cfg.get("port", UI_PORT))
     ui_scheme = str(ui_cfg.get("domain_scheme") or "http").lower()
-    use_direct_https = ui_scheme == "https" and not bool(ui_cfg.get("domain_reverse_proxy", False))
+    ui_domain = str(ui_cfg.get("domain") or "").strip()
+    use_direct_https = bool(ui_domain) and ui_scheme == "https" and not bool(ui_cfg.get("domain_reverse_proxy", False))
     protocol = "https" if use_direct_https else "http"
     
     print(f"UI: {protocol}://{ui_host}:{ui_port}/", flush=True)
