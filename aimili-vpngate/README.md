@@ -10,6 +10,7 @@ AimiliVPN Gateway 是一个基于 VPNGate 与 OpenVPN 的轻量代理网关模�
 - 按连接延迟、评分或状态排序
 - HTTP/SOCKS5 本地代理出口
 - OpenVPN 连接状态与代理出口自检
+- 终端菜单配置域名访问地址
 
 ## 部署
 
@@ -26,6 +27,12 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpxcer/aimili-sentinel/m
 ```
 
 安装后可使用 `ml` 命令进入本模块管理菜单。
+
+常用命令：
+
+- `ml web`：配置后台监听地址与安全后缀
+- `ml domain`：配置域名访问地址
+- `ml port`：配置 Web 后台端口与代理端口
 
 ## 默认端口
 

@@ -171,7 +171,8 @@ def load_ui_config() -> dict[str, Any]:
             "secret_path": "EJsW2EeBo9lY",
             "password": "",
             "host": "::",
-            "port": 8787
+            "port": 8787,
+            "domain": ""
         }
         updated = False
         if auth_file.exists():
@@ -292,6 +293,7 @@ def get_state() -> dict[str, Any]:
     state["proxy_port"] = ui_cfg.get("proxy_port", 7928)
     state["routing_mode"] = ui_cfg.get("routing_mode", "auto")
     state["force_country"] = ui_cfg.get("force_country", "")
+    state["domain"] = ui_cfg.get("domain", "")
     
     return state
 

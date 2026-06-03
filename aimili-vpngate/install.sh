@@ -194,6 +194,8 @@ import time
 import tty
 import termios
 import shutil
+import re
+import urllib.parse
 
 INSTALL_DIR = "/opt/aimili-sentinel/aimili-vpngate"
 LOG_FILE = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/vpngate.log"
@@ -215,7 +217,7 @@ def generate_random_suffix():
 def load_ui_cfg():
     import json
     path = "/opt/aimili-sentinel/aimili-vpngate/vpngate_data/ui_auth.json"
-    cfg = {"host": "::", "port": 8787, "secret_path": "EJsW2EeBo9lY", "password": ""}
+    cfg = {"host": "::", "port": 8787, "secret_path": "EJsW2EeBo9lY", "password": "", "domain": ""}
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -236,6 +238,51 @@ def save_ui_cfg(cfg):
         return True
     except Exception:
         return False
+
+def normalize_domain(value):
+    value = (value or "").strip()
+    if not value:
+        return ""
+    if "://" in value:
+        parsed = urllib.parse.urlsplit(value)
+        value = parsed.netloc or parsed.path
+    value = value.strip().strip("/")
+    if "@" in value:
+        value = value.rsplit("@", 1)[-1]
+    if value.startswith("[") and "]" in value:
+        value = value[1:value.index("]")]
+    elif ":" in value:
+        value = value.split(":", 1)[0]
+    return value.lower()
+
+def valid_domain(value):
+    if not value or len(value) > 253:
+        return False
+    if value in ("localhost",):
+        return True
+    if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", value):
+        return False
+    return bool(re.match(r"^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$", value))
+
+def build_web_url(host, port, secret_path):
+    if host in ("127.0.0.1", "localhost"):
+        display_host = "127.0.0.1"
+    elif host == "::1":
+        display_host = "[::1]"
+    elif host == "::":
+        display_host = get_public_ip()
+    else:
+        display_host = f"[{host}]" if ":" in str(host) else str(host)
+    return f"http://{display_host}:{port}/{secret_path}/"
+
+def build_domain_url(cfg):
+    domain = normalize_domain(cfg.get("domain", ""))
+    if not domain:
+        return ""
+    port = int(cfg.get("port", 8787) or 8787)
+    secret_path = cfg.get("secret_path", "EJsW2EeBo9lY")
+    port_part = "" if port == 80 else f":{port}"
+    return f"http://{domain}{port_part}/{secret_path}/"
 
 def load_state():
     import json
@@ -426,16 +473,10 @@ def print_status():
     print_line(format_line(f"管理后台 (Port {ui_port})", backend_status))
     print_line(format_line("连接核心 (OpenVPN)", openvpn_status))
     
-    host_cfg = cfg.get("host", "::")
-    if host_cfg in ("127.0.0.1", "localhost"):
-        login_ip = "127.0.0.1"
-    elif host_cfg == "::1":
-        login_ip = "[::1]"
-    elif host_cfg == "::":
-        login_ip = get_public_ip()
-    else:
-        login_ip = f"[{host_cfg}]" if ":" in host_cfg else host_cfg
-    print_line(format_line("网页登录地址", f"{yellow}http://{login_ip}:{ui_port}/{secret_path}/{reset}"))
+    print_line(format_line("网页登录地址", f"{yellow}{build_web_url(cfg.get('host', '::'), ui_port, secret_path)}{reset}"))
+    domain_url = build_domain_url(cfg)
+    if domain_url:
+        print_line(format_line("域名访问地址", f"{yellow}{domain_url}{reset}"))
     print_line(format_line("网页管理账号", cfg.get("username", "未配置")))
     curr_pwd = cfg.get("password", "")
     masked_pwd = curr_pwd if len(curr_pwd) <= 4 else curr_pwd[:3] + "********" + curr_pwd[-2:]
@@ -667,6 +708,56 @@ def configure_web():
         elif key == '3' or key == 'q' or key == '\x03':
             break
 
+def configure_domain():
+    cfg = load_ui_cfg()
+    while True:
+        print("\033[H\033[J", end="")
+        print("=======================================================")
+        print("                    域名访问配置                       ")
+        print("=======================================================")
+        curr_domain = normalize_domain(cfg.get("domain", ""))
+        curr_domain_text = curr_domain or "未配置"
+        print(f"当前域名: {curr_domain_text}")
+        if curr_domain:
+            print(f"当前域名访问地址: {build_domain_url(cfg)}")
+        print("-------------------------------------------------------")
+        print("  [1] 设置/修改访问域名")
+        print("  [2] 清除访问域名")
+        print("  [3] 返回主菜单")
+        print("=======================================================")
+        print("请直接输入数字键 [1-3] 快速执行：", end="", flush=True)
+
+        key = getch()
+        if key == '1':
+            print("\033[H\033[J", end="")
+            raw = input("请输入域名 (例如 vpn.example.com，按回车取消): ").strip()
+            if not raw:
+                continue
+            domain = normalize_domain(raw)
+            if not valid_domain(domain):
+                print("错误: 域名格式不正确，请输入类似 vpn.example.com 的域名。")
+                time.sleep(2)
+                continue
+            cfg["domain"] = domain
+            if cfg.get("host") in ("127.0.0.1", "localhost", "::1"):
+                sel = input("当前后台仅本地监听，域名无法访问。是否改为双栈公网监听 (::)? [Y/n]: ").strip().lower()
+                if sel not in ("n", "no"):
+                    cfg["host"] = "::"
+            save_ui_cfg(cfg)
+            print("域名访问配置已保存。")
+            print(f"域名访问地址: {build_domain_url(cfg)}")
+            print("请确认域名 DNS 已解析到本 VPS，并在安全组/防火墙放行网页管理端口。")
+            ask_restart()
+            break
+        elif key == '2':
+            cfg["domain"] = ""
+            save_ui_cfg(cfg)
+            print("域名访问配置已清除。")
+            time.sleep(1)
+            break
+        elif key == '3' or key == 'q' or key == '\x03':
+            break
+
 def configure_port():
     cfg = load_ui_cfg()
     while True:
@@ -866,12 +957,14 @@ def main():
             uninstall_service()
         elif cmd == "web":
             configure_web()
+        elif cmd == "domain":
+            configure_domain()
         elif cmd == "port":
             configure_port()
         elif cmd == "password":
             configure_credentials()
         else:
-            print("未知命令。可用命令: start, stop, restart, status, logs, update, uninstall, web, port, password")
+            print("未知命令。可用命令: start, stop, restart, status, logs, update, uninstall, web, domain, port, password")
         sys.exit(0)
         
     options = {
@@ -884,8 +977,10 @@ def main():
         '7': ("账号密码 (ml password)", configure_credentials),
         '8': ("一键更新 (ml update)", update_service),
         '9': ("完全卸载 (ml uninstall)", uninstall_service),
+        '10': ("配置域名访问 (ml domain)", configure_domain),
         '0': ("退出终端", None)
     }
+    option_order = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
     
     # Enter alternate buffer and hide cursor
     print("\033[?1049h\033[?25l\033[H\033[J", end="", flush=True)
@@ -901,15 +996,13 @@ def main():
                 green = "\033[1;32m"
                 
                 print_line(f"【{bold}终端指令菜单栏{reset}】")
-                for key in sorted(options.keys()):
-                    if key == '0':
-                        continue
+                for key in option_order:
                     name, _ = options[key]
                     print_line(f"  {green}[{key}]{reset} {name}")
                 print_line(f"  {green}[0]{reset} {options['0'][0]}")
                 print_line("=======================================================")
                 print_line("提示: 当前为静态页面。按 [回车键/Enter] 手动刷新状态。")
-                print("请直接输入数字键 [0-9] 快速选择执行：\033[K", end="", flush=True)
+                print("请直接输入数字键 [0-10] 快速选择执行：\033[K", end="", flush=True)
                 print("\033[J", end="", flush=True)
                 need_redraw = False
                 
@@ -928,8 +1021,15 @@ def main():
                 need_redraw = True
                 continue
                 
-            if key in options:
-                name, func = options[key]
+            selected_key = key
+            if key == '1':
+                next_key = getch_timeout(0.35)
+                if next_key == '0':
+                    selected_key = '10'
+                elif next_key not in (None, ''):
+                    selected_key = key
+            if selected_key in options:
+                name, func = options[selected_key]
                 if func is None:
                     break
                     
@@ -943,7 +1043,7 @@ def main():
                     print(f"执行出错: {e}")
                     
                 if func not in (start_service, stop_service, restart_service,
-                                configure_web, configure_port, configure_credentials, show_logs, update_service):
+                                configure_web, configure_domain, configure_port, configure_credentials, show_logs, update_service):
                     input("\n操作已完成，按回车键返回主菜单...")
                     
                 # Re-enter alternate buffer and hide cursor
@@ -968,6 +1068,7 @@ if [ ! -f "$AUTH_FILE" ]; then
     
     # Initialize defaults
     UI_PORT=8787
+    UI_DOMAIN=""
     # generate random secret suffix (12 chars alphanumeric)
     SECRET_PATH=$(python3 -c "import random, string; print(''.join(random.choices(string.ascii_letters + string.digits, k=12)))")
     # generate random password
@@ -1039,6 +1140,33 @@ while True:
                 echo -e "${RED}输入错误: 密码长度不能少于 4 位！${PLAIN}"
             fi
         done
+
+        while true; do
+            read -p "请输入访问域名 [可选，例如 vpn.example.com，按回车跳过]: " input_domain
+            if [ -z "$input_domain" ]; then
+                break
+            fi
+            normalized_domain=$(python3 -c "import re, urllib.parse, sys
+value=sys.argv[1].strip()
+if '://' in value:
+    p=urllib.parse.urlsplit(value)
+    value=p.netloc or p.path
+value=value.strip().strip('/').lower()
+if '@' in value:
+    value=value.rsplit('@', 1)[-1]
+if value.startswith('[') and ']' in value:
+    value=value[1:value.index(']')]
+elif ':' in value:
+    value=value.split(':', 1)[0]
+ok=bool(re.match(r'^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$', value))
+print(value if ok else '')" "$input_domain")
+            if [ -n "$normalized_domain" ]; then
+                UI_DOMAIN="$normalized_domain"
+                break
+            else
+                echo -e "${RED}输入错误: 域名格式不正确，请输入类似 vpn.example.com 的域名。${PLAIN}"
+            fi
+        done
     fi
 
     # Write config JSON
@@ -1049,7 +1177,8 @@ cfg = {
     'port': int('$UI_PORT'),
     'secret_path': '$SECRET_PATH',
     'username': '$UI_USERNAME',
-    'password': '$UI_PASSWORD'
+    'password': '$UI_PASSWORD',
+    'domain': '$UI_DOMAIN'
 }
 with open('$AUTH_FILE', 'w', encoding='utf-8') as f:
     json.dump(cfg, f, ensure_ascii=False, indent=2)
