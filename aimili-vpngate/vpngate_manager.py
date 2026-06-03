@@ -20,6 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 import concurrent.futures
+import html
 import sys
 import uuid
 
@@ -1547,11 +1548,11 @@ LOGIN_HTML = r"""<!DOCTYPE html>
       <h2 class="login-title">AimiliVPN</h2>
       <p class="login-subtitle">请输入您的管理账号和安全密码以继续</p>
       
-      <form id="login_form" onsubmit="handleLogin(event)">
+      <form id="login_form" onsubmit="handleLogin(event)" novalidate>
         <div class="form-group">
           <label class="form-label" for="username">管理账号</label>
           <div class="input-wrapper">
-            <input type="text" id="username" name="username" class="input-field" placeholder="请输入管理账号" required autocomplete="username">
+            <input type="text" id="username" name="username" class="input-field" placeholder="请输入管理账号" value="__LOGIN_USERNAME__" required autocomplete="username">
           </div>
         </div>
         <div class="form-group" style="margin-top: 16px;">
@@ -1578,12 +1579,20 @@ LOGIN_HTML = r"""<!DOCTYPE html>
       const submitBtn = document.getElementById("submit_btn");
       
       errorText.style.display = "none";
+      if (!uname || !pwd) {
+        errorText.textContent = !uname ? "请输入管理账号" : "请输入安全密码";
+        errorText.style.display = "block";
+        document.getElementById(!uname ? "username" : "password").focus();
+        return;
+      }
+
       submitBtn.disabled = true;
       submitBtn.querySelector("span").textContent = "正在验证...";
       
       try {
         const response = await fetch("./api/login", {
           method: "POST",
+          credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username: uname, password: pwd })
         });
@@ -1608,6 +1617,11 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 </body>
 </html>
 """
+
+def render_login_html() -> str:
+    ui_cfg = load_ui_config()
+    username = html.escape(str(ui_cfg.get("username", "")), quote=True)
+    return LOGIN_HTML.replace("__LOGIN_USERNAME__", username)
 
 INDEX_HTML = r"""<!doctype html>
 <html lang="zh-CN">
@@ -4203,7 +4217,7 @@ class Handler(BaseHTTPRequestHandler):
         
         if not self.is_authorized():
             if effective_path in ("/", "/index.html"):
-                self.send_bytes(LOGIN_HTML.encode("utf-8"), "text/html; charset=utf-8")
+                self.send_bytes(render_login_html().encode("utf-8"), "text/html; charset=utf-8")
                 return
             else:
                 self.send_json({"error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED)
