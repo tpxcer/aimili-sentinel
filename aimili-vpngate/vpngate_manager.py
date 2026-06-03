@@ -22,7 +22,6 @@ from typing import Any
 import concurrent.futures
 import html
 import sys
-import uuid
 
 # Prefer IPv4 resolution to avoid slow AAAA DNS timeouts (e.g. in WSL),
 # but fall back to system default (IPv6) if IPv4 resolution fails.
@@ -1599,7 +1598,11 @@ LOGIN_HTML = r"""<!DOCTYPE html>
         
         const data = await response.json();
         if (response.ok && data.ok) {
-          window.location.reload();
+          if (data.session && data.cookie_path) {
+            const secureAttr = window.location.protocol === "https:" ? "; Secure" : "";
+            document.cookie = `session_fallback=${encodeURIComponent(data.session)}; Path=${data.cookie_path}; SameSite=Lax; Max-Age=2592000${secureAttr}`;
+          }
+          window.location.replace("./");
         } else {
           errorText.textContent = data.error || "账号或密码不正确，请重新输入";
           errorText.style.display = "block";
@@ -4171,9 +4174,13 @@ class Handler(BaseHTTPRequestHandler):
                     k, v = item.split("=", 1)
                     cookies[k.strip()] = v.strip()
         
-        session_token = cookies.get("session")
+        session_token = cookies.get("session") or cookies.get("session_fallback")
         if not session_token:
             return False
+
+        expected_token = get_session_token(pwd, ui_cfg.get("username", "admin"))
+        if session_token == expected_token:
+            return True
             
         with lock:
             exp_time = active_sessions.get(session_token)
@@ -4401,16 +4408,18 @@ class Handler(BaseHTTPRequestHandler):
                 expected_uname = ui_cfg.get("username", "admin")
                 
                 if expected_pwd and input_pwd == expected_pwd and input_uname == expected_uname:
-                    token = uuid.uuid4().hex
+                    token = get_session_token(expected_pwd, expected_uname)
                     with lock:
                         active_sessions[token] = time.time() + 30 * 24 * 3600
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/json; charset=utf-8")
                     secret_path = self.get_secret_path()
                     cookie_path = f"/{secret_path}/" if secret_path else "/"
-                    self.send_header("Set-Cookie", f"session={token}; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=2592000")
+                    secure_attr = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" else ""
+                    self.send_header("Set-Cookie", f"session={token}; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=2592000{secure_attr}")
+                    self.send_header("Set-Cookie", f"session_fallback={token}; Path={cookie_path}; SameSite=Lax; Max-Age=2592000{secure_attr}")
                     self.end_headers()
-                    self.wfile.write(json.dumps({"ok": True}).encode("utf-8"))
+                    self.wfile.write(json.dumps({"ok": True, "session": token, "cookie_path": cookie_path}).encode("utf-8"))
                 else:
                     self.send_json({"ok": False, "error": "用户名或密码不正确，请重新输入"}, HTTPStatus.FORBIDDEN)
             except Exception as exc:
@@ -4427,8 +4436,10 @@ class Handler(BaseHTTPRequestHandler):
                         if "=" in item:
                             k, v = item.split("=", 1)
                             cookies[k.strip()] = v.strip()
-                session_token = cookies.get("session")
-                if session_token:
+                session_tokens = [cookies.get("session"), cookies.get("session_fallback")]
+                for session_token in session_tokens:
+                    if not session_token:
+                        continue
                     with lock:
                         active_sessions.pop(session_token, None)
                 secret_path = self.get_secret_path()
@@ -4436,6 +4447,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(HTTPStatus.OK)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Set-Cookie", f"session=; Path={cookie_path}; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT")
+                self.send_header("Set-Cookie", f"session_fallback=; Path={cookie_path}; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT")
                 self.end_headers()
                 self.wfile.write(json.dumps({"ok": True}).encode("utf-8"))
             except Exception as exc:
